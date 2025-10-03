@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# --- Definitive High-Speed Installation Script ---
+# --- Definitive High-Speed Installation Script (v2 - with 416 fix) ---
 # This script uses 'uv' for fast Python package installation and 'aria2c' for
 # multi-threaded, concurrent downloads to achieve the fastest possible setup time.
 
@@ -155,16 +155,22 @@ fi
 
 DOWNLOAD_LIST=()
 
+# --- FIX for 416 Error: Clean up partial/complete files before redownload ---
 # Build the list of files to download
 if [ ! -d "GPT_SoVITS/pretrained_models/sv" ]; then
+    rm -f pretrained_models.zip # Ensure clean download
     DOWNLOAD_LIST+=("--out=pretrained_models.zip" "$BASE_URL/pretrained_models.zip")
 fi
 if [ ! -d "GPT_SoVITS/text/G2PWModel" ]; then
+    rm -f G2PWModel.zip # Ensure clean download
     DOWNLOAD_LIST+=("--out=G2PWModel.zip" "$BASE_URL/G2PWModel.zip")
 fi
 if [ "$DOWNLOAD_UVR5" = "true" ] && ! find -L "tools/uvr5/uvr5_weights" -mindepth 1 ! -name '.gitignore' | grep -q .; then
+    rm -f uvr5_weights.zip # Ensure clean download
     DOWNLOAD_LIST+=("--out=uvr5_weights.zip" "$BASE_URL/uvr5_weights.zip")
 fi
+# NLTK and OpenJTalk are small and always checked/downloaded for simplicity, ensure clean state
+rm -f nltk_data.zip open_jtalk_dic_utf_8-1.11.tar.gz
 DOWNLOAD_LIST+=("--out=nltk_data.zip" "$BASE_URL/nltk_data.zip")
 DOWNLOAD_LIST+=("--out=open_jtalk_dic_utf_8-1.11.tar.gz" "$BASE_URL/open_jtalk_dic_utf_8-1.11.tar.gz")
 
@@ -175,6 +181,7 @@ if [ ${#DOWNLOAD_LIST[@]} -gt 0 ]; then
 else
     echo -e "${INFO}All models and data files already exist. Skipping download."
 fi
+# --- END of FIX ---
 
 # --- PHASE 3: Unpacking ---
 echo -e "${INFO}Unpacking files..."
@@ -223,7 +230,6 @@ if [ "$WORKFLOW" = false ]; then
 fi
 
 echo -e "${INFO}Installing Python dependencies from requirements files..."
-# --- OPTIMIZATION: Combined uv pip install from previous version is retained ---
 run_pip_quiet -r extra-req.txt -r requirements.txt
 echo -e "${SUCCESS}Python dependencies installed."
 
