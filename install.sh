@@ -39,6 +39,8 @@ run_conda_quiet() {
     }
 }
 
+# --- MODIFIED FUNCTION ---
+# Changed pip to uv pip for faster installation
 run_pip_quiet() {
     local output
     output=$(uv pip install "$@" 2>&1) || {
@@ -46,14 +48,15 @@ run_pip_quiet() {
         exit 1
     }
 }
+# --- END OF MODIFICATION ---
 
 run_wget_quiet() {
     if wget --tries=25 --wait=5 --read-timeout=40 -q --show-progress "$@" 2>&1; then
         tput cuu1 && tput el
     else
-        echo -e "${ERROR} Wget failed";
+        echo -e "${ERROR} Wget failed"
         exit 1
-    }
+    fi
 }
 
 if ! command -v conda &>/dev/null; then
