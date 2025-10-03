@@ -41,8 +41,8 @@ run_conda_quiet() {
 
 run_pip_quiet() {
     local output
-    output=$(pip install "$@" 2>&1) || {
-        echo -e "${ERROR} Pip install failed:\n$output"
+    output=$(uv pip install "$@" 2>&1) || {
+        echo -e "${ERROR} UV Pip install failed:\n$output"
         exit 1
     }
 }
@@ -53,7 +53,7 @@ run_wget_quiet() {
     else
         echo -e "${ERROR} Wget failed"
         exit 1
-    fi
+    }
 }
 
 if ! command -v conda &>/dev/null; then
