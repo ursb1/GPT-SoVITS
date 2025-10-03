@@ -51,7 +51,7 @@ run_wget_quiet() {
     if wget --tries=25 --wait=5 --read-timeout=40 -q --show-progress "$@" 2>&1; then
         tput cuu1 && tput el
     else
-        echo -e "${ERROR} Wget failed"
+        echo -e "${ERROR} Wget failed";
         exit 1
     }
 }
